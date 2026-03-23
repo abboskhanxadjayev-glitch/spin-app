@@ -1,5 +1,7 @@
 import "dotenv/config";
 import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
 import { Server as SocketIOServer } from "socket.io";
 import { createApp } from "./app.js";
 import { verifyAppToken } from "./lib/app-token.js";
@@ -11,6 +13,8 @@ import { createRoomManager } from "./lib/room-manager.js";
 const config = loadConfig();
 const db = initDb(config);
 const roomManager = createRoomManager();
+const webDir = path.resolve(config.rootDir, "web");
+const webIndexFile = path.resolve(webDir, "index.html");
 
 let io = null;
 function toSocketRoomPayload(roomState, roomManager) {
@@ -162,6 +166,9 @@ server.listen(config.port, () => {
   console.log(`spin server listening on port ${config.port}`);
   console.log(`mini app URL: ${config.miniAppUrl}`);
   console.log(`global room ready: ${roomManager.roomId}`);
+  console.log(`web dir: ${webDir}`);
+  console.log(`web index: ${webIndexFile}`);
+  console.log(`web index exists: ${fs.existsSync(webIndexFile)}`);
 });
 
 function shutdown() {

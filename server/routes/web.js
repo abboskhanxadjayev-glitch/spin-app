@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "node:fs";
 import path from "node:path";
 
 export function createWebRouter({ rootDir }) {
@@ -13,19 +14,31 @@ export function createWebRouter({ rootDir }) {
     },
   };
 
-  router.use(express.static(webDir, staticOptions));
-  router.use("/app", express.static(webDir, staticOptions));
   router.get("/", (_req, res) => {
     res.redirect("/app");
   });
-  router.get("/app", (_req, res) => {
+
+  function sendAppShell(req, res) {
+    const exists = fs.existsSync(indexFile);
+    console.info("[web] /app request", {
+      path: req.path,
+      webDir,
+      indexFile,
+      indexExists: exists,
+    });
+
+    if (!exists) {
+      res.status(500).send("Mini App shell is missing.");
+      return;
+    }
+
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
     res.sendFile(indexFile);
-  });
-  router.get("/app/*", (_req, res) => {
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-    res.sendFile(indexFile);
-  });
+  }
+
+  router.get("/app", sendAppShell);
+  router.get("/app/*", sendAppShell);
+  router.use(express.static(webDir, staticOptions));
 
   return router;
 }
