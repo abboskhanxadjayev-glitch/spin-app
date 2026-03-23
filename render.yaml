@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: spin-app
+    runtime: node
+    repo: https://github.com/abboskhanxadjayev-glitch/spin-app.git
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: WEB_APP_URL
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: APP_TOKEN_SECRET
+        sync: false
+      - key: DATABASE_PATH
+        value: server/db/spin.sqlite
+      - key: APP_TIME_ZONE
+        value: Asia/Tashkent
+      - key: ALLOW_UNSAFE_INIT_DATA
+        value: "false"
+      - key: MEDIA_AUDIO_HEARTS_COST
+        value: "5"
+      - key: MEDIA_VIDEO_HEARTS_COST
+        value: "12"
+      - key: YOUTUBE_API_KEY
+        sync: false
