@@ -20,8 +20,7 @@ export function createApp({
   roomManager,
   broadcastRoomUpdate,
   broadcastChatMessage,
-  broadcastMediaState,
-  broadcastMediaQueue,
+  broadcastTurnUpdate,
 }) {
   const app = express();
 
@@ -36,11 +35,26 @@ export function createApp({
       roomManager,
       broadcastRoomUpdate,
       broadcastChatMessage,
-      broadcastMediaState,
-      broadcastMediaQueue,
+      broadcastTurnUpdate,
     })
   );
   app.use(createWebRouter({ rootDir: config.rootDir }));
+  app.use((req, res) => {
+    console.warn("[server] route not found", {
+      method: req.method,
+      path: req.path,
+    });
+
+    if (req.path.startsWith("/api")) {
+      res.status(404).json({
+        ok: false,
+        error: "Not Found",
+      });
+      return;
+    }
+
+    res.status(404).send("Not Found");
+  });
   app.use((err, req, res, _next) => {
     console.error("[server] unhandled app error", {
       method: req.method,
